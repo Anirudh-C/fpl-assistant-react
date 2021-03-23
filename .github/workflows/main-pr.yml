@@ -27,6 +27,8 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+    - uses: actions/checkout@v2
+
     - name: Build Container
       run: docker build -t strangeloop1710/fpl-react:latest .
 
