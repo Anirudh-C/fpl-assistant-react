@@ -1,7 +1,8 @@
 name: FPL Assistant Front-End CI
 
 on:
-  pull_request: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   test:
