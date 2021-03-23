@@ -27,14 +27,8 @@ jobs:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-    - name: Build and Push
-      id: docker_build
-      uses: docker/build-push-action@v2
-      with:
-        context: ./
-        file: ./Dockerfile
-        push: true
-        tags: strangeloop1710/fpl-react:latest
+    - name: Build Container
+      run: docker build -t strangeloop1710/fpl-react:latest .
 
-    - name: Digest
-      run: echo ${{ steps.docker_build.outputs.digest }}
+    - name: Push Container
+      run: docker push strangeloop1710/fpl-react:latest
