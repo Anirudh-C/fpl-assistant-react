@@ -2,17 +2,29 @@ import React from 'react';
 import {
     BrowserRouter as Router,
     Switch,
-    Route,
-    Link,
+    Route
 } from "react-router-dom";
+
+import Cookies from "js-cookie";
 
 import Login from "./Login";
 import Home from "./Home";
 
 class App extends React.Component {
-    handleLogin(login, password) {
-        console.log(login);
-        console.log(password);
+    constructor(props) {
+        super(props);
+        this.state = {
+            loggedIn: false
+        };
+    }
+
+    handleLogin(status) {
+        this.setState({ loggedIn : true });
+    }
+
+    handleLogout() {
+        this.setState({ loggedIn : false });
+        Cookies.remove("key");
     }
 
     render() {
@@ -21,10 +33,10 @@ class App extends React.Component {
               <div>
                 <Switch>
                   <Route path="/login">
-                    <Login loginCallback={this.handleLogin}/>
+                    <Login loginCallback={this.handleLogin.bind(this)}/>
                   </Route>
                   <Route path="/">
-                    <Home />
+                    <Home login={this.state.loggedIn} logoutCallback={this.handleLogout.bind(this)}/>
                   </Route>
                 </Switch>
               </div>

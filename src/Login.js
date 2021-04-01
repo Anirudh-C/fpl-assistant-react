@@ -17,6 +17,8 @@ import {
     ThemeProvider
 } from '@material-ui/core/styles';
 
+import { withRouter } from "react-router-dom";
+
 const theme = createMuiTheme({
     palette: {
         primary: {
@@ -65,15 +67,35 @@ class Login extends React.Component {
         super(props);
         this.state = {
             email: "",
-            password: ""
+            password: "",
+            loggedIn: false
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit(event) {
-        event.preventDefault();
-        this.props.loginCallback(this.state.email, this.state.password);
+        if (!this.state.loggedIn) {
+            event.preventDefault();
+            var form = new FormData();
+            form.append("login", this.state.email);
+            form.append("password", this.state.password);
+            const request = {
+                mode: "no-cors",
+                method: "POST",
+                credentials: "include",
+                body: form
+            };
+            fetch("/api/login", request)
+                .then(response => {
+                    this.setState({ loggedIn: true });
+                    this.props.history.push("/");
+                    this.props.loginCallback(true);
+                });
+        }
+        else {
+            this.props.history.push("/");
+        }
     }
 
     render() {
@@ -123,10 +145,6 @@ class Login extends React.Component {
                             event =>
                                 this.setState({password: event.target.value})}
                       />
-                      <FormControlLabel
-                        control={<Checkbox value="remember" color="primary"/>}
-                        label="Remember me"
-                      />
                       <Button
                         type="submit"
                         fullWidth
@@ -163,4 +181,4 @@ class Login extends React.Component {
     }
 }
 
-export default withStyles(styles)(Login);
+export default withRouter(withStyles(styles)(Login));
