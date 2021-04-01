@@ -2,7 +2,6 @@
   "name": "fpl-react",
   "version": "1.0.0",
   "description": "FPL Assistant Front-End",
-  "main": "index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -25,7 +24,7 @@
   },
   "scripts": {
     "start": "parcel --no-source-maps index.html",
-    "build": "parcel build index.html",
+    "build": "parcel build index.html --dist-dir ./dist",
     "test": "jest"
   },
   "jest": {
