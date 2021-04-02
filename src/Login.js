@@ -11,24 +11,9 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 
-import {
-    withStyles,
-    createMuiTheme,
-    ThemeProvider
-} from '@material-ui/core/styles';
+import { withStyles } from "@material-ui/core/styles";
 
 import { withRouter } from "react-router-dom";
-
-const theme = createMuiTheme({
-    palette: {
-        primary: {
-            main: "#37003c",
-        },
-        secondary: {
-            main: "#00ff87",
-        },
-    },
-});
 
 const styles = theme => ({
     root: {
@@ -102,81 +87,79 @@ class Login extends React.Component {
         const { classes } = this.props;
 
         return (
-            <ThemeProvider theme={theme}>
-              <Grid container component="main" className={classes.root}>
-                <CssBaseline />
-                <Grid item xs={false} sm={4} md={7} className={classes.image} />
-                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                  <div className={classes.paper}>
-                    <Avatar className={classes.avatar}>
-                      <LockOutlinedIcon/>
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                      Sign In to FPL
-                    </Typography>
-                    <form
-                      className={classes.form}
-                      noValidate
-                      onSubmit={this.handleSubmit}>
-                      <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
+            <Grid container component="main" className={classes.root}>
+              <CssBaseline />
+              <Grid item xs={false} sm={4} md={7} className={classes.image} />
+              <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                <div className={classes.paper}>
+                  <Avatar className={classes.avatar}>
+                    <LockOutlinedIcon/>
+                  </Avatar>
+                  <Typography component="h1" variant="h5">
+                    Sign In to FPL
+                  </Typography>
+                  <form
+                    className={classes.form}
+                    noValidate
+                    onSubmit={this.handleSubmit}>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="email"
+                      label="Email Address"
+                      name="email"
+                      autoComplete="email"
+                      autoFocus
+                      onInput={
+                          event =>
+                              this.setState({email: event.target.value})}
+                    />
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      fullWidth
+                      id="password"
+                      label="Password"
+                      type="password"
+                      autoComplete="current-password"
+                      onInput={
+                          event =>
+                              this.setState({password: event.target.value})}
+                    />
+                    <Button
+                      type="submit"
                         fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        onInput={
-                            event =>
-                                this.setState({email: event.target.value})}
-                      />
-                      <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="password"
-                        label="Password"
-                        type="password"
-                        autoComplete="current-password"
-                        onInput={
-                            event =>
-                                this.setState({password: event.target.value})}
-                      />
-                      <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                      >
-                        Sign In
-                      </Button>
-                      <Grid container>
-                        <Grid item xs>
-                          <Link
-                            href="https://users.premierleague.com/accounts/password-reset"
-                            variant="body2"
-                          >
-                            Forgot Password?
-                          </Link>
-                        </Grid>
-                        <Grid item>
-                          <Link
-                            href="https://users.premierleague.com/a/profile/register"
-                            variant="body2"
-                          >
-                            {"Don't have an account? Sign Up"}
-                          </Link>
-                        </Grid>
+                      variant="contained"
+                      color="primary"
+                      className={classes.submit}
+                    >
+                      Sign In
+                    </Button>
+                    <Grid container>
+                      <Grid item xs>
+                        <Link
+                          href="https://users.premierleague.com/accounts/password-reset"
+                          variant="body2"
+                        >
+                          Forgot Password?
+                        </Link>
                       </Grid>
-                    </form>
+                      <Grid item>
+                        <Link
+                          href="https://users.premierleague.com/a/profile/register"
+                          variant="body2"
+                        >
+                          {"Don't have an account? Sign Up"}
+                        </Link>
+                      </Grid>
+                    </Grid>
+                  </form>
                   </div>
-                </Grid>
               </Grid>
-            </ThemeProvider>
+            </Grid>
         );
     }
 }

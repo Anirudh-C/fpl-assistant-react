@@ -7,6 +7,23 @@ import {
 
 import Cookies from "js-cookie";
 
+import {
+    withStyles,
+    createMuiTheme,
+    ThemeProvider
+} from '@material-ui/core/styles';
+
+const appTheme = createMuiTheme({
+    palette: {
+        primary: {
+            main: "#37003c",
+        },
+        secondary: {
+            main: "#00ff87",
+        },
+    },
+});
+
 import Login from "./Login";
 import Home from "./Home";
 
@@ -29,18 +46,24 @@ class App extends React.Component {
 
     render() {
         return (
-            <Router>
-              <div>
-                <Switch>
-                  <Route path="/login">
-                    <Login loginCallback={this.handleLogin.bind(this)}/>
-                  </Route>
-                  <Route path="/">
-                    <Home login={this.state.loggedIn} logoutCallback={this.handleLogout.bind(this)}/>
-                  </Route>
-                </Switch>
-              </div>
-            </Router>
+            <ThemeProvider theme={appTheme}>
+              <Router>
+                <div>
+                  <Switch>
+                    <Route path="/login">
+                      <Login loginCallback={this.handleLogin.bind(this)}/>
+                    </Route>
+                    <Route path="/">
+                      <Home login={this.state.loggedIn} logoutCallback={this.handleLogout.bind(this)}/>
+                      <ErrorDialog
+                        visible={this.state.errorDialog}
+                        text={this.state.errorText}
+                        handleClose={this.handleErrorClose.bind(this)}/>
+                    </Route>
+                  </Switch>
+                </div>
+              </Router>
+            </ThemeProvider>
         );
     }
 }
