@@ -26,22 +26,34 @@ const appTheme = createMuiTheme({
 
 import Login from "./Login";
 import Home from "./Home";
+import ErrorDialog from "./ErrorDialog";
 
 class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loggedIn: false
+            loggedIn: false,
+            errorDialog: false,
+            errorText: ""
         };
     }
 
-    handleLogin(status) {
-        this.setState({ loggedIn : true });
+    handleLogin(response) {
+        if (response.ok) {
+            this.setState({ loggedIn : true });
+        }
+        else {
+            this.setState({ errorDialog: true, errorText: response.statusText });
+        }
     }
 
     handleLogout() {
         this.setState({ loggedIn : false });
         Cookies.remove("key");
+    }
+
+    handleErrorClose() {
+        this.setState({ errorDialog: false, errorText: "" });
     }
 
     render() {

@@ -66,16 +66,21 @@ class Login extends React.Component {
             form.append("login", this.state.email);
             form.append("password", this.state.password);
             const request = {
-                mode: "no-cors",
                 method: "POST",
                 credentials: "include",
                 body: form
             };
             fetch("/api/login", request)
                 .then(response => {
-                    this.setState({ loggedIn: true });
-                    this.props.history.push("/");
-                    this.props.loginCallback(true);
+                    if (response.ok) {
+                        this.setState({ loggedIn: true });
+                        this.props.history.push("/");
+                        this.props.loginCallback(response);
+                    }
+                    else {
+                        this.props.history.push("/");
+                        this.props.loginCallback(response);
+                    }
                 });
         }
         else {
