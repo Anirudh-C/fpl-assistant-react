@@ -49,7 +49,6 @@ class App extends React.Component {
 
     handleLogout() {
         this.setState({ loggedIn : false });
-        Cookies.remove("key");
     }
 
     handleErrorClose() {
