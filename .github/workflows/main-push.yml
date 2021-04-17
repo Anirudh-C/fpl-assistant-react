@@ -1,0 +1,20 @@
+name: FPL Assistant Deployment
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Ansible
+      uses: ./.github/actions/ansible
+      env:
+        VAULT_PASS: ${{ secrets.VAULT_PASS }}
+        GCLOUD_SERVICE_ACCOUNT: ${{ secrets.GCLOUD_SERVICE_ACCOUNT }}
+        GCLOUD_SERVICE_ACCOUNT_KEY: ${{ secrets.GCLOUD_SERVICE_ACCOUNT_KEY }}
+        INVENTORY: ./deployment/inventory.yml
+        PLAYBOOK: ./deployment/deploy-playbook.yml
