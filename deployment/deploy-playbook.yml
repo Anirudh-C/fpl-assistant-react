@@ -1,0 +1,54 @@
+- name: Deploy FPL Assistant
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Connecting to GKE
+      shell: gcloud container clusters get-credentials "{{ cluster_name }}" --zone "{{ zone }}" --project "{{ project_id }}"
+
+    - name: Creating namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: fpl
+
+    - name: Creating secret
+      kubernetes.core.k8s:
+        state: present
+        namespace: fpl
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mysqldatabase
+          type: Opaque
+          stringData:
+            DB_ROOT_PASS: "{{ root_pass }}"
+            DB_USERNAME: "{{ db_user }}"
+            DB_PASS: "{{ db_pass }}"
+
+    - name: Creating storage class
+      kubernetes.core.k8s:
+        state: present
+        namespace: fpl
+        definition:
+          apiVersion: v1
+          kind: StorageClass
+          metadata:
+            name: fplstorage
+          provisioner: kubernetes.io/gce-pd
+          reclaimPolicy: Retain
+          parameters:
+            type: pd-standard
+            fstype: ext4
+            replication-type: none
+
+    - name: Deploying application
+      kubernetes.core.k8s:
+        state: present
+        namespace: fpl
+        apply: yes
+        src: ./kube-deployment.yml

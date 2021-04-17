@@ -1,0 +1,39 @@
+- name: Undeploy FPL Assistant
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Undeploying application
+      kubernetes.core.k8s:
+        state: absent
+        namespace: fpl
+        src: ./kube-deployment.yml
+
+    - name: Deleting secret
+      kubernetes.core.k8s:
+        state: absent
+        namespace: fpl
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: mysqldatabase
+
+    - name: Deleting storage class
+      kubernetes.core.k8s:
+        state: absent
+        namespace: fpl
+        definition:
+          apiVersion: v1
+          kind: StorageClass
+          metadata:
+            name: fplstorage
+
+    - name: Deleting namespace
+      kubernetes.core.k8s:
+        state: absent
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: fpl
