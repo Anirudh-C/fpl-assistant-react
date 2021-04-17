@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "$GCLOUD_SERVICE_ACCOUNT_KEY" > ~/.service_account_key.json
+echo "$GCLOUD_SERVICE_ACCOUNT_KEY" | base64 -d > ~/.service_account_key.json
 gcloud auth activate-service-account "$GCLOUD_SERVICE_ACCOUNT" --key-file ~/.service_account_key.json
 
 echo "$VAULT_PASS" > ~/.vault_pass.txt
