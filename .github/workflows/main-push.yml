@@ -3,6 +3,8 @@ name: FPL Assistant Deployment
 on:
   push:
     branches: [ master ]
+  repository_dispatch:
+    types: [ init-deploy ]
 
 jobs:
   deploy:
