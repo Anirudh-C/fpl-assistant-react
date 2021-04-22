@@ -10,9 +10,14 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import { Link } from "react-router-dom";
 
+import DashCard from "../components/DashCard";
+
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
+    root: {
+        flexGrow: 1,
+    },
     bar: {
         flexGrow: 1,
         backgroundImage: 'url(https://raw.githubusercontent.com/Anirudh-C/fpl-assistant-react/master/assets/header-pl.png)',
@@ -41,27 +46,56 @@ class Home extends React.Component {
         const { classes } = this.props;
 
         return (
-            <AppBar position="static" className={classes.bar}>
-              <Toolbar>
-                <Typography variant="h6" align="center" className={classes.title}>
-                  Fantasy Premier League Assistant
-                </Typography>
-                {
-                    this.props.login ?
-                        <Button onClick={this.props.logoutCallback} color="inherit">
-                          <Link to="/" className={classes.link}>
-                            Logout
-                          </Link>
-                        </Button>
-                    :
-                    <Button color="inherit">
-                      <Link to="/login" className={classes.link}>
-                        Login
-                      </Link>
-                    </Button>
-                }
-              </Toolbar>
-            </AppBar>
+            <div className={classes.root}>
+              <AppBar position="static" className={classes.bar}>
+                <Toolbar>
+                  <Typography variant="h6" align="center" className={classes.title}>
+                    Fantasy Premier League Assistant
+                  </Typography>
+                  {
+                      this.props.login ?
+                          <Button onClick={this.props.logoutCallback} color="inherit">
+                            <Link to="/" className={classes.link}>
+                              Logout
+                            </Link>
+                          </Button>
+                      :
+                      <Button color="inherit">
+                        <Link to="/login" className={classes.link}>
+                          Login
+                        </Link>
+                      </Button>
+                  }
+                </Toolbar>
+              </AppBar>
+              <Container maxWidth="lg" className={classes.container}>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <DashCard
+                      title="Pick your players!"
+                      subtitle="Coming Soon"
+                      linkText="More"
+                      link="/"/>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <DashCard
+                      title="Compare players"
+                      subtitle="Coming Soon"
+                      linkText="More"
+                      link="/compare"
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <DashCard
+                      title="The Best Team"
+                      subtitle="Coming Soon"
+                      linkText="More"
+                      link="/"
+                    />
+                  </Grid>
+                </Grid>
+              </Container>
+            </div>
         );
     }
 }
