@@ -24,9 +24,9 @@ const appTheme = createMuiTheme({
     },
 });
 
-import Login from "./Login";
-import Home from "./Home";
-import ErrorDialog from "./ErrorDialog";
+import Login from "./layouts/Login";
+import Home from "./layouts/Home";
+import ErrorDialog from "./components/ErrorDialog";
 
 class App extends React.Component {
     constructor(props) {
