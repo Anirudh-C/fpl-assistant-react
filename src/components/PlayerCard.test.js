@@ -4,6 +4,6 @@ import PlayerCard from './PlayerCard';
 
 describe('PlayerCard', () => {
     it('should render correctly', () => {
-        const component = shallow(<DashCard visible={true}/>);
+        const component = shallow(<PlayerCard visible={true}/>);
     });
 });
