@@ -125,7 +125,7 @@ class Picks extends React.Component {
                 </Toolbar>
               </AppBar>
               <Container maxWidth="lg" className={classes.container}>
-                <Grid container spacing={3}>
+                <Grid container>
                   <Grid item xs={11} md={11}>
                     <Typography variant="h4">
                       Substitutions
@@ -151,14 +151,18 @@ class Picks extends React.Component {
                        </IconButton>
                      </Tooltip>}
                   </Grid>
+                </Grid>
+                <Grid container spacing={3}>
                   {this.state.subComplete ?
                    <Grid item xs={12} md={12}>
-                     <Typography variant="h5" align="center">
+                     <Typography variant="h5" align="center" color="textSecondary">
                        Done!
                      </Typography>
                    </Grid>
                    :
                    cards["subs"]}
+                </Grid>
+                <Grid container>
                   <Grid item xs={11} md={11}>
                     <Typography variant="h4">
                       Transfers
@@ -184,9 +188,11 @@ class Picks extends React.Component {
                        </IconButton>
                      </Tooltip>}
                   </Grid>
+                </Grid>
+                <Grid container spacing={3}>
                   {this.state.transferComplete ?
                    <Grid item xs={12} md={12}>
-                     <Typography variant="h5" align="center">
+                     <Typography variant="h5" align="center" color="textSecondary">
                        Done!
                      </Typography>
                    </Grid>
