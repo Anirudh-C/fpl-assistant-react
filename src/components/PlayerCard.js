@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -10,14 +9,26 @@ import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import PersonIcon from '@material-ui/icons/Person';
-import CancelIcon from '@material-ui/icons/Cancel';
+import CancelTwoToneIcon from '@material-ui/icons/CancelTwoTone';
+import Tooltip from '@material-ui/core/Tooltip';
 
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
+    card: {
+        transition: "0.3s",
+        boxShadow: "0 8px 40px -12px rgba(0,0,0,0.3)",
+        borderRadius: 20,
+        "&:hover": {
+            boxShadow: "0 16px 70px -12.125px rgba(0,0,0,0.3)"
+        }
+    },
     form: {
-        margin: theme.spacing(1),
         width: "100%",
+    },
+    closeButton: {
+        marginLeft: "auto",
+        color: '#fc045c',
     },
     icon: {
         color: theme.palette.text.secondary,
@@ -27,28 +38,41 @@ const styles = theme => ({
         width: "80%",
         marginLeft: 'auto',
         paddingRight: theme.spacing(3),
-    }
+    },
+    scorePie: {
+        fill: "none",
+    },
+    score: {
+        height: 250,
+        width: 250,
+        preserveAspectRatio: "none",
+        maxWidth: "100%",
+    },
+    scoreText: {
+        fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", \"sans-serif\"",
+        fontWeight: 600,
+        fontSize: "6rem",
+        lineHeight: "1.167",
+        letterSpacing: "-0.01562em",
+        fill: "#37003c",
+    },
 });
 
 class PlayerCard extends React.Component {
     constructor(props) {
         super(props);
-        this.defaultPlayer = {
-            id: 0,
-            name: this.props.name,
-            team: this.props.team,
-            threat: "0.0",
-            influence: "0.0",
-            goals: 0,
-            assists: 0,
-            creativity: "0.0",
-        };
         this.state = {
-            player: this.defaultPlayer,
+            player: this.props.defaultPlayer,
             options: [],
             inputQuery: "",
             chosen: false,
-            playerUrl: "",
+            playerUrl:
+            this.props.defaultPlayer.id === 0 ?
+                ""
+                :
+                "https://resources.premierleague.com/premierleague/photos/players/110x140/p" +
+                this.props.defaultPlayer.code + ".png",
+            scoreColour: this.props.scoreColour,
         };
     }
 
@@ -63,15 +87,13 @@ class PlayerCard extends React.Component {
                       }
                       :
                       {
-                          player: this.defaultPlayer,
+                          player: this.props.defaultPlayer,
                           options: [],
                           inputQuery: "",
                           chosen: false,
                           playerUrl: ""
                       });
-        if (this.state.chosen) {
-            this.props.compareCallback(this.props.id, this.state.player);
-        }
+        this.props.compareCallback(this.props.id, newValue);
     }
 
     handlePlayerSearch(event, newValue, reason) {
@@ -83,6 +105,23 @@ class PlayerCard extends React.Component {
             fetch("/api/search_players?query=" + this.state.inputQuery.toLowerCase())
                 .then(response => response.json())
                 .then(response => this.setState({ options: response["players"] }));
+        }
+        if (prevProps.scoreColour !== this.props.scoreColour) {
+            this.setState({
+                scoreColour : this.props.scoreColour
+            });
+        }
+        if (prevProps.defaultPlayer !== this.props.defaultPlayer) {
+            this.setState({
+                player: this.props.defaultPlayer,
+                chosen: true,
+                playerUrl:
+                this.props.defaultPlayer.id === 0 ?
+                    ""
+                    :
+                    "https://resources.premierleague.com/premierleague/photos/players/110x140/p" +
+                    this.props.defaultPlayer.code + ".png"
+            });
         }
     }
 
@@ -117,19 +156,27 @@ class PlayerCard extends React.Component {
 
     unChoosePlayer() {
         this.setState({
-            player: this.defaultPlayer,
+            player: this.props.defaultPlayer,
             options: [],
             inputQuery: "",
             chosen: false,
-            playerUrl: ""
+            playerUrl: "",
+            scoreColour: "#37003c",
         });
+        this.props.compareCallback(this.props.id, null);
     }
 
     render() {
+        const size = 250;
+        const strokeWidth = 20;
+        const center = size / 2;
+        const radius = size / 2 - strokeWidth / 2;
+        const circ = 2 * Math.PI * radius;
+        const score = Math.round(parseFloat(this.state.player.influence) / 7.556);
         const { classes } = this.props;
 
         return (
-            <Card>
+            <Card className={classes.card} variant="outlined">
               <CardContent className={classes.content}>
                 <Typography variant="h6" component="h2">
                   {this.state.player.name}
@@ -137,7 +184,7 @@ class PlayerCard extends React.Component {
                 <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
                   {this.state.player.team}
                 </Typography>
-                {!this.state.chosen ?
+                {!this.state.chosen && this.props.showStats?
                  <Autocomplete
                    options={this.state.options}
                    onChange={this.handlePlayerSelect.bind(this)}
@@ -145,11 +192,12 @@ class PlayerCard extends React.Component {
                    getOptionLabel={(option) => option.name}
                    getOptionSelected={(option, value) => option.id === value.id}
                    renderOption={this.renderOption.bind(this)}
-                   renderInput={(params) => <TextField {...params} label="Player name:"/>}
+                   className={classes.form}
+                   renderInput={(params) => <TextField {...params} variant="outlined" label="Player name:"/>}
                    noOptionsText="No players"
                  />
                  :
-                 <Grid container spacing={3}>
+                 <Grid container spacing={3} alignItems="center" direction="column">
                    <Grid item xs={12} md={6}>
                      <CardMedia
                        className={classes.media}
@@ -159,22 +207,48 @@ class PlayerCard extends React.Component {
                      />
                    </Grid>
                    <Grid item xs={12} md={6}>
-                     <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
-                       Stats coming soon!
-                     </Typography>
+                     <svg className={classes.score}>
+                       <circle
+                         className={classes.scorePie}
+                         stroke={this.state.scoreColour}
+                         cx={center}
+                         cy={center}
+                         r={radius}
+                         strokeWidth={strokeWidth}
+                         strokeDasharray={circ}
+                         strokeDashoffset={(100 - score) * circ / 100}
+                       />
+                       <text
+                         className={classes.scoreText}
+                         x="50%"
+                         y="50%"
+                         dominantBaseline="middle"
+                         textAnchor="middle"
+                       >
+                          {score}
+                        </text>
+                     </svg>
                    </Grid>
+                   {this.props.showStats &&
+                    <Grid item xs={12} md={12}>
+                      <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
+                        Stats coming soon!
+                      </Typography>
+                    </Grid>}
                  </Grid>}
               </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  color="primary"
-                  disabled={!this.state.chosen}
-                  onClick={this.unChoosePlayer.bind(this)}
-                >
-                  Close Player
-                </Button>
-              </CardActions>
+              {this.props.showStats &&
+               <CardActions>
+                 <Tooltip title="Close">
+                   <IconButton
+                     disabled={!this.state.chosen}
+                     onClick={this.unChoosePlayer.bind(this)}
+                     className={classes.closeButton}
+                   >
+                     <CancelTwoToneIcon />
+                   </IconButton>
+                 </Tooltip>
+               </CardActions>}
             </Card>
         );
     }

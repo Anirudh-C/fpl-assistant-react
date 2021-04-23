@@ -36,17 +36,52 @@ class Compare extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            player1: null,
-            player2: null,
+            players: [null, null],
+            scoreColours: ["#37003c", "#37003c"],
         };
+        this.defaultPlayer = {
+            id: 0,
+            name: "Name",
+            team: "Team",
+            threat: "0.0",
+            influence: "0.0",
+            goals: 0,
+            assists: 0,
+            creativity: "0.0",
+        };
+    }
+
+    setColours(player1, player2) {
+        if (player1 && player2) {
+            this.setState({
+                scoreColours:
+                [
+                    player1.influence > player2.influence ?
+                        "#00ff87" : "#fc045c",
+                    player1.influence > player2.influence ?
+                        "#fc045c": "#00ff87"
+                ]
+            });
+        }
+        else {
+            this.setState({
+                scoreColours: ["#37003c", "#37003c"]
+            });
+        }
     }
 
     compareCallback(id, player) {
         if (id === 1) {
-            this.setState({ player1: player });
+            this.setState({
+                players: [player, this.state.players[1]]
+            });
+            this.setColours(player, this.state.players[1]);
         }
         else {
-            this.setState({ player2: player });
+            this.setState({
+                players: [this.state.players[0], player]
+            });
+            this.setColours(this.state.players[0], player);
         }
     }
 
@@ -64,21 +99,23 @@ class Compare extends React.Component {
               </AppBar>
               <Container maxWidth="lg" className={classes.container}>
                 <Grid container spacing={3}>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} md={6}>
                     <PlayerCard
                       id={1}
-                      name="Name"
-                      team="Team"
+                      defaultPlayer={this.defaultPlayer}
                       compareCallback={this.compareCallback.bind(this)}
-                      other={this.state.player2}/>
+                      scoreColour={this.state.scoreColours[0]}
+                      showStats={true}
+                    />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} md={6}>
                     <PlayerCard
                       id={2}
-                      name="Name"
-                      team="Team"
+                      defaultPlayer={this.defaultPlayer}
                       compareCallback={this.compareCallback.bind(this)}
-                      other={this.state.player1}/>
+                      scoreColour={this.state.scoreColours[1]}
+                      showStats={true}
+                    />
                   </Grid>
                 </Grid>
               </Container>
