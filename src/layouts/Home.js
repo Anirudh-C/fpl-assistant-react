@@ -75,7 +75,7 @@ class Home extends React.Component {
                       title="Pick your players!"
                       subtitle="Coming Soon"
                       linkText="More"
-                      link="/"/>
+                      link="/picks"/>
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <DashCard

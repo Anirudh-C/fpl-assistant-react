@@ -27,6 +27,7 @@ const appTheme = createMuiTheme({
 import Login from "./layouts/Login";
 import Home from "./layouts/Home";
 import Compare from "./layouts/Compare";
+import Picks from "./layouts/Picks";
 import ErrorDialog from "./components/ErrorDialog";
 
 class App extends React.Component {
@@ -64,6 +65,9 @@ class App extends React.Component {
                   <Switch>
                     <Route path="/login">
                       <Login loginCallback={this.handleLogin.bind(this)}/>
+                    </Route>
+                    <Route path="/picks">
+                      <Picks />
                     </Route>
                     <Route path="/compare">
                       <Compare />
