@@ -41,13 +41,11 @@ class Compare extends React.Component {
         };
         this.defaultPlayer = {
             id: 0,
-            name: "Name",
-            team: "Team",
-            threat: "0.0",
-            influence: "0.0",
+            full_name: "Name",
+            team_id: -1,
+            score: "0",
             goals: 0,
             assists: 0,
-            creativity: "0.0",
         };
     }
 
@@ -56,9 +54,9 @@ class Compare extends React.Component {
             this.setState({
                 scoreColours:
                 [
-                    player1.influence > player2.influence ?
+                    player1.score > player2.score ?
                         "#00ff87" : "#fc045c",
-                    player1.influence > player2.influence ?
+                    player1.score > player2.score ?
                         "#fc045c": "#00ff87"
                 ]
             });

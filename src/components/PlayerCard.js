@@ -25,6 +25,7 @@ const styles = theme => ({
     },
     form: {
         width: "100%",
+        marginTop: theme.spacing(4),
     },
     closeButton: {
         marginLeft: "auto",
@@ -64,6 +65,7 @@ class PlayerCard extends React.Component {
         this.state = {
             player: this.props.defaultPlayer,
             options: [],
+            teams: [],
             inputQuery: "",
             chosen: false,
             playerUrl:
@@ -100,9 +102,15 @@ class PlayerCard extends React.Component {
         reason === "input" && this.setState({ inputQuery: newValue });
     }
 
+    componentDidMount() {
+        fetch("/api/teams")
+            .then(response => response.json())
+            .then(response => this.setState({ teams: response["teams"] }));
+    }
+
     componentDidUpdate(prevProps, prevState) {
         if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery != "") {
-            fetch("/api/search_players?query=" + this.state.inputQuery.toLowerCase())
+            fetch("/api/search_players?name=" + this.state.inputQuery.toLowerCase())
                 .then(response => response.json())
                 .then(response => this.setState({ options: response["players"] }));
         }
@@ -127,12 +135,12 @@ class PlayerCard extends React.Component {
 
     renderOption(option) {
         const { classes } = this.props;
-        const preName = option.name.substring(
+        const preName = option.full_name.substring(
             0, option.match);
-        const matchName = option.name.substring(
+        const matchName = option.full_name.substring(
             option.match, option.match + this.state.inputQuery.length);
-        const postName = option.name.substring(
-            option.match + this.state.inputQuery.length, option.name.length);
+        const postName = option.full_name.substring(
+            option.match + this.state.inputQuery.length, option.full_name.length);
 
         return (
             <Grid container alignItems="center">
@@ -172,24 +180,23 @@ class PlayerCard extends React.Component {
         const center = size / 2;
         const radius = size / 2 - strokeWidth / 2;
         const circ = 2 * Math.PI * radius;
-        const score = Math.round(parseFloat(this.state.player.influence) / 7.556);
         const { classes } = this.props;
 
         return (
             <Card className={classes.card} variant="outlined">
               <CardContent className={classes.content}>
                 <Typography variant="h6" component="h2">
-                  {this.state.player.name}
+                  {this.state.player.full_name}
                 </Typography>
                 <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
-                  {this.state.player.team}
+                  {this.state.teams[this.state.player.team_id - 1]}
                 </Typography>
                 {!this.state.chosen && this.props.showStats?
                  <Autocomplete
                    options={this.state.options}
                    onChange={this.handlePlayerSelect.bind(this)}
                    onInputChange={this.handlePlayerSearch.bind(this)}
-                   getOptionLabel={(option) => option.name}
+                   getOptionLabel={(option) => option.full_name}
                    getOptionSelected={(option, value) => option.id === value.id}
                    renderOption={this.renderOption.bind(this)}
                    className={classes.form}
@@ -216,7 +223,7 @@ class PlayerCard extends React.Component {
                          r={radius}
                          strokeWidth={strokeWidth}
                          strokeDasharray={circ}
-                         strokeDashoffset={(100 - score) * circ / 100}
+                         strokeDashoffset={(100 - this.state.player.score) * circ / 100}
                        />
                        <text
                          className={classes.scoreText}
@@ -225,7 +232,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                          {score}
+                         {Math.floor(this.state.player.score)}
                         </text>
                      </svg>
                    </Grid>
@@ -240,13 +247,14 @@ class PlayerCard extends React.Component {
               {this.props.showStats &&
                <CardActions>
                  <Tooltip title="Close">
-                   <IconButton
-                     disabled={!this.state.chosen}
-                     onClick={this.unChoosePlayer.bind(this)}
-                     className={classes.closeButton}
-                   >
-                     <CancelTwoToneIcon />
-                   </IconButton>
+                   <span className={classes.closeButton}>
+                     <IconButton
+                       disabled={!this.state.chosen}
+                       onClick={this.unChoosePlayer.bind(this)}
+                     >
+                       <CancelTwoToneIcon />
+                     </IconButton>
+                   </span>
                  </Tooltip>
                </CardActions>}
             </Card>
