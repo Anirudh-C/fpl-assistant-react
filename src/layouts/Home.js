@@ -75,7 +75,10 @@ class Home extends React.Component {
                       title="Manage your team"
                       subtitle="Coming Soon"
                       linkText="More"
-                      link="/picks"/>
+                      link="/picks"
+                      loginReqd={true}
+                      login={this.props.login}
+                    />
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <DashCard

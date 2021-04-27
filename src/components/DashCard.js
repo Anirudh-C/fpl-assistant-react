@@ -41,9 +41,15 @@ class DashCard extends React.Component {
               </CardContent>
               <CardActions>
                 <Button size="small" className={classes.moreButton}>
-                  <Link to={this.props.link} className={classes.link}>
-                    {this.props.linkText}
-                  </Link>
+                  {this.props.loginReqd && !this.props.login ?
+                   <Link to="/login" className={classes.link}>
+                     {this.props.linkText}
+                   </Link>
+                   :
+                   <Link to={this.props.link} className={classes.link}>
+                     {this.props.linkText}
+                   </Link>
+                  }
                 </Button>
               </CardActions>
             </Card>
