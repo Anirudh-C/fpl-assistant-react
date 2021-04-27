@@ -72,7 +72,7 @@ class Home extends React.Component {
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <DashCard
-                      title="Pick your players!"
+                      title="Manage your team"
                       subtitle="Coming Soon"
                       linkText="More"
                       link="/picks"/>
@@ -87,7 +87,7 @@ class Home extends React.Component {
                   </Grid>
                   <Grid item xs={12} md={6}>
                     <DashCard
-                      title="The Best Team"
+                      title="The Best Players"
                       subtitle="Coming Soon"
                       linkText="More"
                       link="/"

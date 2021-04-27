@@ -11,6 +11,10 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import PersonIcon from '@material-ui/icons/Person';
 import CancelTwoToneIcon from '@material-ui/icons/CancelTwoTone';
 import Tooltip from '@material-ui/core/Tooltip';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -27,8 +31,10 @@ const styles = theme => ({
         width: "100%",
         marginTop: theme.spacing(4),
     },
-    closeButton: {
+    closeButtonSpan: {
         marginLeft: "auto",
+    },
+    closeButton: {
         color: '#fc045c',
     },
     icon: {
@@ -57,6 +63,19 @@ const styles = theme => ({
         letterSpacing: "-0.01562em",
         fill: "#37003c",
     },
+    scoreRank: {
+        fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", \"sans-serif\"",
+        fontWeight: 400,
+        fontSize: "1rem",
+        lineHeight: "1.75",
+        fill: "#37003c",
+    },
+    statsContainer: {
+        marginTop: theme.spacing(4),
+    },
+    stats: {
+        border: "none"
+    },
 });
 
 class PlayerCard extends React.Component {
@@ -66,6 +85,8 @@ class PlayerCard extends React.Component {
             player: this.props.defaultPlayer,
             options: [],
             teams: [],
+            types: [],
+            stats: this.props.stats,
             inputQuery: "",
             chosen: false,
             playerUrl:
@@ -106,6 +127,9 @@ class PlayerCard extends React.Component {
         fetch("/api/teams")
             .then(response => response.json())
             .then(response => this.setState({ teams: response["teams"] }));
+        fetch("/api/element_types")
+            .then(response => response.json())
+            .then(response => this.setState({ types: response["element_types"] }));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -117,6 +141,11 @@ class PlayerCard extends React.Component {
         if (prevProps.scoreColour !== this.props.scoreColour) {
             this.setState({
                 scoreColour : this.props.scoreColour
+            });
+        }
+        if (prevProps.stats !== this.props.stats) {
+            this.setState({
+                stats: this.props.stats
             });
         }
         if (prevProps.defaultPlayer !== this.props.defaultPlayer) {
@@ -158,6 +187,9 @@ class PlayerCard extends React.Component {
                   {postName}
                 </Typography>
               </Grid>
+              <Grid item>
+                {Math.floor(option.score)}
+              </Grid>
             </Grid>
         );
     }
@@ -174,6 +206,35 @@ class PlayerCard extends React.Component {
         this.props.compareCallback(this.props.id, null);
     }
 
+    renderStats(classes) {
+        let stats = [];
+        if (this.state.chosen) {
+            this.state.stats.forEach((item) => {
+                stats.push(
+                    <Grid item xs={6} md={6} key={item.key}>
+                      <Table style={{ backgroundColor: item.colour }}>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell align="left" className={classes.stats}>
+                              <Typography variant="button" >
+                                {item.text[0]}
+                              </Typography>
+                            </TableCell>
+                            <TableCell align="right" className={classes.stats}>
+                              <Typography variant="h6">
+                                {this.state.player[item.key] + item.text[1]}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </Grid>
+                );
+            });
+        }
+        return stats;
+    }
+
     render() {
         const size = 250;
         const strokeWidth = 20;
@@ -181,15 +242,19 @@ class PlayerCard extends React.Component {
         const radius = size / 2 - strokeWidth / 2;
         const circ = 2 * Math.PI * radius;
         const { classes } = this.props;
+        const stats = this.renderStats(classes);
 
         return (
             <Card className={classes.card} variant="outlined">
-              <CardContent className={classes.content}>
-                <Typography variant="h6" component="h2">
+              <CardContent>
+                <Typography variant="h5" component="h2">
                   {this.state.player.full_name}
                 </Typography>
                 <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
-                  {this.state.teams[this.state.player.team_id - 1]}
+                  {!this.state.chosen ? "Team" : this.state.teams[this.state.player.team_id - 1]}
+                </Typography>
+                <Typography variant="button" component="div">
+                  {!this.state.chosen ? "Position" : this.state.types[this.state.player.element_type - 1]}
                 </Typography>
                 {!this.state.chosen && this.props.showStats?
                  <Autocomplete
@@ -233,24 +298,40 @@ class PlayerCard extends React.Component {
                          textAnchor="middle"
                        >
                          {Math.floor(this.state.player.score)}
-                        </text>
+                       </text>
+                       <text
+                         className={classes.scoreRank}
+                         x="50%"
+                         y="70%"
+                         dominantBaseline="middle"
+                         textAnchor="middle"
+                       >
+                         # {Math.floor(Math.random() * 100)}
+                       </text>
                      </svg>
                    </Grid>
-                   {this.props.showStats &&
-                    <Grid item xs={12} md={12}>
-                      <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
-                        Stats coming soon!
-                      </Typography>
-                    </Grid>}
                  </Grid>}
+                {
+                    this.props.showStats &&
+                        <Grid
+                          container
+                          spacing={3}
+                          alignItems="center"
+                          className={classes.statsContainer}
+                        >
+                          {stats}
+                        </Grid>
+                }
+
               </CardContent>
               {this.props.showStats &&
                <CardActions>
                  <Tooltip title="Close">
-                   <span className={classes.closeButton}>
+                   <span className={classes.closeButtonSpan}>
                      <IconButton
                        disabled={!this.state.chosen}
                        onClick={this.unChoosePlayer.bind(this)}
+                       className={classes.closeButton}
                      >
                        <CancelTwoToneIcon />
                      </IconButton>

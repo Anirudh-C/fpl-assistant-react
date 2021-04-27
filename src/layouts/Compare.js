@@ -35,9 +35,43 @@ const styles = theme => ({
 class Compare extends React.Component {
     constructor(props) {
         super(props);
+        this.stats = [
+            {
+                key: "goals_scored",
+                text: ["Goals: ", ""],
+                colour: "rgba(255, 255, 255, 0)",
+            },
+            {
+                key: "assists",
+                text: ["Assists: ", ""],
+                colour: "rgba(255, 255, 255, 0)",
+            },
+            {
+                key: "clean_sheets",
+                text: ["Clean Sheets: ", ""],
+                colour: "rgba(255, 255, 255, 0)",
+            },
+            {
+                key: "now_cost",
+                text: ["Price: ", "m"],
+                colour: "rgba(255, 255, 255, 0)",
+            },
+            {
+                key: "points_per_game",
+                text: ["Avg Points: ", ""],
+                colour: "rgba(255, 255, 255, 0)",
+            },
+            {
+                key: "bps",
+                text: ["Bonus: ", ""],
+                colour: "rgba(255, 255, 255, 0)",
+            },
+        ];
+
         this.state = {
             players: [null, null],
             scoreColours: ["#37003c", "#37003c"],
+            stats: [ this.stats, this.stats ]
         };
         this.defaultPlayer = {
             id: 0,
@@ -51,19 +85,60 @@ class Compare extends React.Component {
 
     setColours(player1, player2) {
         if (player1 && player2) {
+            let stats1 = [];
+            let stats2 = [];
+            this.stats.forEach(
+                (stat, i) =>
+                    {
+                        if (player1[stat.key] > player2[stat.key]) {
+                            stats1.push({
+                                key: stat.key,
+                                text: stat.text,
+                                colour: "rgba(0, 255, 135, 0.1)"
+                            });
+                            stats2.push({
+                                key: stat.key,
+                                text: stat.text,
+                                colour: "rgba(252, 4, 92, 0.1)"
+                            });
+                        }
+                        else if (player1[stat.key] < player2[stat.key]) {
+                            stats2.push({
+                                key: stat.key,
+                                text: stat.text,
+                                colour: "rgba(0, 255, 135, 0.1)"
+                            });
+                            stats1.push({
+                                key: stat.key,
+                                text: stat.text,
+                                colour: "rgba(252, 4, 92, 0.1)"
+                            });
+                        }
+                        else {
+                            stats1.push(this.stats[i]);
+                            stats2.push(this.stats[i]);
+                        }
+                    });
+
+            let colour1 = "";
+            let colour2 = "";
+            if (player1.score > player2.score) {
+                colour1 = "#00ff87";
+                colour2 = "#fc045c";
+            }
+            else if (player1.score < player2.score) {
+                colour2 = "#00ff87";
+                colour1 = "#fc045c";
+            }
             this.setState({
-                scoreColours:
-                [
-                    player1.score > player2.score ?
-                        "#00ff87" : "#fc045c",
-                    player1.score > player2.score ?
-                        "#fc045c": "#00ff87"
-                ]
+                scoreColours: [ colour1, colour2 ],
+                stats: [ stats1, stats2 ],
             });
         }
         else {
             this.setState({
-                scoreColours: ["#37003c", "#37003c"]
+                scoreColours: ["#37003c", "#37003c"],
+                stats: [ this.stats, this.stats ]
             });
         }
     }
@@ -104,6 +179,7 @@ class Compare extends React.Component {
                       compareCallback={this.compareCallback.bind(this)}
                       scoreColour={this.state.scoreColours[0]}
                       showStats={true}
+                      stats={this.state.stats[0]}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -113,6 +189,7 @@ class Compare extends React.Component {
                       compareCallback={this.compareCallback.bind(this)}
                       scoreColour={this.state.scoreColours[1]}
                       showStats={true}
+                      stats={this.state.stats[1]}
                     />
                   </Grid>
                 </Grid>
