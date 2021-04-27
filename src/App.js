@@ -28,6 +28,7 @@ import Login from "./layouts/Login";
 import Home from "./layouts/Home";
 import Compare from "./layouts/Compare";
 import Picks from "./layouts/Picks";
+import PlayerTable from "./layouts/PlayerTable";
 import ErrorDialog from "./components/ErrorDialog";
 
 class App extends React.Component {
@@ -66,12 +67,9 @@ class App extends React.Component {
                     <Route path="/login">
                       <Login loginCallback={this.handleLogin.bind(this)}/>
                     </Route>
-                    <Route path="/picks">
-                      <Picks />
-                    </Route>
-                    <Route path="/compare">
-                      <Compare />
-                    </Route>
+                    <Route path="/picks" component={Picks} />
+                    <Route path="/compare" component={Compare}/>
+                    <Route path="/players" component={PlayerTable}/>
                     <Route path="/">
                       <Home login={this.state.loggedIn} logoutCallback={this.handleLogout.bind(this)}/>
                       <ErrorDialog

@@ -93,7 +93,7 @@ class Home extends React.Component {
                       title="The Best Players"
                       subtitle="Coming Soon"
                       linkText="More"
-                      link="/"
+                      link="/players"
                     />
                   </Grid>
                 </Grid>

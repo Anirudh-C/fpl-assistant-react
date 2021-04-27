@@ -124,9 +124,6 @@ class PlayerCard extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/teams")
-            .then(response => response.json())
-            .then(response => this.setState({ teams: response["teams"] }));
         fetch("/api/element_types")
             .then(response => response.json())
             .then(response => this.setState({ types: response["element_types"] }));
@@ -149,16 +146,25 @@ class PlayerCard extends React.Component {
             });
         }
         if (prevProps.defaultPlayer !== this.props.defaultPlayer) {
-            this.setState({
-                player: this.props.defaultPlayer,
-                chosen: true,
-                playerUrl:
-                this.props.defaultPlayer.id === 0 ?
-                    ""
-                    :
-                    "https://resources.premierleague.com/premierleague/photos/players/110x140/p" +
-                    this.props.defaultPlayer.code + ".png"
-            });
+            if (this.props.defaultPlayer) {
+                this.setState({
+                    player: this.props.defaultPlayer,
+                    chosen: true,
+                    playerUrl:
+                    this.props.defaultPlayer.id === 0 ?
+                        ""
+                        :
+                        "https://resources.premierleague.com/premierleague/photos/players/110x140/p" +
+                        this.props.defaultPlayer.code + ".png"
+                });
+            }
+            else {
+                this.setState({
+                    player: { id: 0, full_name: "Name", team_name: "Team", score: "0.0" },
+                    chosen: false,
+                    playerUrls: ""
+                });
+            }
         }
     }
 
@@ -251,7 +257,7 @@ class PlayerCard extends React.Component {
                   {this.state.player.full_name}
                 </Typography>
                 <Typography variant="body2" component="p" color="textSecondary" gutterBottom>
-                  {!this.state.chosen ? "Team" : this.state.teams[this.state.player.team_id - 1]}
+                  {this.state.player.team_name}
                 </Typography>
                 <Typography variant="button" component="div">
                   {!this.state.chosen ? "Position" : this.state.types[this.state.player.element_type - 1]}
