@@ -54,4 +54,4 @@
         src: ./kube-deployment.yml
 
     - name: Replace new images
-      run: kubectl replace -f ./deployment/kube-deployment.yml
+      shell: kubectl replace -f ./deployment/kube-deployment.yml
