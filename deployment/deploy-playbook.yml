@@ -63,20 +63,4 @@
       kubernetes.core.k8s:
         state: present
         apply: yes
-        definition:
-          apiVersion: networking.k8s.io/v1beta1
-          metadata:
-            name: fpl-ingress
-            annotations:
-              kubernetes.io/ingress.class: "gce"
-          spec:
-          - http:
-              paths:
-                - path: /*
-                  backend:
-                    serviceName: frontend-service
-                    servicePort: 3000
-                - path: /api/*
-                  backend:
-                    serviceName: api-service
-                    servicePort: 3001
+        src: ./ingress.yml
