@@ -46,6 +46,13 @@
             fstype: ext4
             replication-type: none
 
+    - name: Checking full deployment
+      kubernetes.core.k8s:
+        state: present
+        namespace: fpl
+        apply: yes
+        src: ./full-deployment.yml
+
     - name: Un-deploying Pods
       kubernetes.core.k8s:
         state: absent
@@ -58,10 +65,3 @@
         apply: yes
         namespace: fpl
         src: ./pods.yml
-
-    - name: Checking full deployment
-      kubernetes.core.k8s:
-        state: present
-        namespace: fpl
-        apply: yes
-        src: ./full-deployment.yml

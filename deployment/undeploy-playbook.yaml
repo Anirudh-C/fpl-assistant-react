@@ -7,7 +7,7 @@
       kubernetes.core.k8s:
         state: absent
         namespace: fpl
-        src: ./kube-deployment.yml
+        src: ./full-deployment.yml
 
     - name: Deleting secret
       kubernetes.core.k8s:
