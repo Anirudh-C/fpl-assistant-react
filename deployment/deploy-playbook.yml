@@ -46,9 +46,15 @@
             fstype: ext4
             replication-type: none
 
+    - name: UnDeploying application
+      kubernetes.core.k8s:
+        state: absent
+        namespace: fpl
+        src: ./kube-deployment.yml
+
     - name: Deploying application
       kubernetes.core.k8s:
         state: present
         namespace: fpl
-        force: yes
+        apply: yes
         src: ./kube-deployment.yml
