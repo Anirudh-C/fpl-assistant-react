@@ -67,7 +67,8 @@
           apiVersion: networking.k8s.io/v1beta1
           metadata:
             name: fpl-ingress
-            annotations: kubernetes.io/ingress.class: "gce"
+            annotations:
+              kubernetes.io/ingress.class: "gce"
           spec:
           - http:
               paths:
