@@ -46,11 +46,18 @@
             fstype: ext4
             replication-type: none
 
-    - name: UnDeploying application
+    - name: Undeploying application
       kubernetes.core.k8s:
         state: absent
         namespace: fpl
         src: ./kube-deployment.yml
+
+    - name: Creating PVC
+      kubernetes.core.k8s:
+        state: present
+        apply: yes
+        namespace: fpl
+        src: ./pvc.yml
 
     - name: Deploying application
       kubernetes.core.k8s:
