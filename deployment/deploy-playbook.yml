@@ -46,29 +46,22 @@
             fstype: ext4
             replication-type: none
 
-    - name: Undeploying application
+    - name: Un-deploying Pods
       kubernetes.core.k8s:
         state: absent
         namespace: fpl
-        src: ./kube-deployment.yml
+        src: ./pods.yml
 
-    - name: Creating PVC
+    - name: Re-deploying Pods
       kubernetes.core.k8s:
         state: present
         apply: yes
         namespace: fpl
-        src: ./pvc.yml
+        src: ./pods.yml
 
-    - name: Deploying application
+    - name: Checking full deployment
       kubernetes.core.k8s:
         state: present
         namespace: fpl
         apply: yes
-        src: ./kube-deployment.yml
-
-    - name: Creating Ingress
-      kubernetes.core.k8s:
-        state: present
-        namespace: fpl
-        apply: yes
-        src: ./ingress.yml
+        src: ./full-deployment.yml
