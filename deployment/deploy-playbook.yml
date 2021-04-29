@@ -62,5 +62,6 @@
     - name: Creating Ingress
       kubernetes.core.k8s:
         state: present
+        namespace: fpl
         apply: yes
         src: ./ingress.yml
