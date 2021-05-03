@@ -8,11 +8,19 @@ import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import Avatar from '@material-ui/core/Avatar';
+import AccountCircleTwoToneIcon from '@material-ui/icons/AccountCircleTwoTone';
 import { Link } from "react-router-dom";
 
 import DashCard from "../components/DashCard";
 
 import { withStyles } from '@material-ui/core/styles';
+
+import { withRouter } from "react-router-dom";
+
+import Cookies from "js-cookie";
 
 const styles = theme => ({
     root: {
@@ -38,9 +46,61 @@ const styles = theme => ({
         paddingTop: theme.spacing(4),
         paddingBottom: theme.spacing(4),
     },
+    avatar: {
+        backgroundColor: "#fc045c"
+    }
 });
 
 class Home extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            has_cookie: false,
+            user_name: "",
+            userDialog: false,
+        };
+    }
+
+    handleLogin() {
+        const has_key = typeof Cookies.get("key") !== "undefined";
+        const has_id = typeof Cookies.get("user_id") !== "undefined";
+        if (has_key && has_id) {
+            this.setState({ has_cookie: true });
+            fetch("/api/username?id=" + Cookies.get("user_id"))
+                .then(response => response.json())
+                .then(response => this.setState({ username: response["name"] }));
+            this.props.loginCallback();
+        }
+        else {
+            this.props.history.push("/login");
+        }
+    }
+
+    handleLogout() {
+        this.setState({ has_cookie: false });
+        this.props.logoutCallback();
+    }
+
+    handleUserDialog() {
+        if (this.state.userDialog) {
+            this.setState({ userDialog: false });
+        }
+        else {
+            this.setState({ userDialog: true });
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.location.state) {
+            if (this.props.location.state === "set_cookie") {
+                this.setState({ has_cookie: true });
+                fetch("/api/username?id=" + Cookies.get("user_id"))
+                    .then(response => response.json())
+                    .then(response => this.setState({ username: response["name"] }));
+                this.props.loginCallback();
+            }
+        }
+    }
 
     render() {
         const { classes } = this.props;
@@ -53,17 +113,25 @@ class Home extends React.Component {
                     Fantasy Premier League Assistant
                   </Typography>
                   {
+                      (this.state.has_cookie && this.state.username) &&
+                      <Button onClick={this.handleUserDialog.bind(this)} color="primary">
+                        <Avatar variant="square" className={classes.avatar}>
+                          <AccountCircleTwoToneIcon color="primary"/>
+                        </Avatar>
+                        <Dialog open={this.state.userDialog}>
+                          <DialogTitle>{"You are logged in as: " + this.state.username}</DialogTitle>
+                        </Dialog>
+                      </Button>}
+                  {
                       this.props.login ?
-                          <Button onClick={this.props.logoutCallback} color="inherit">
+                          <Button onClick={this.handleLogout.bind(this)} color="inherit">
                             <Link to="/" className={classes.link}>
                               Logout
                             </Link>
                           </Button>
                       :
-                      <Button color="inherit">
-                        <Link to="/login" className={classes.link}>
-                          Login
-                        </Link>
+                      <Button onClick={this.handleLogin.bind(this)} color="primary">
+                        Login
                       </Button>
                   }
                 </Toolbar>
@@ -103,4 +171,4 @@ class Home extends React.Component {
     }
 }
 
-export default withStyles(styles)(Home);
+export default withRouter(withStyles(styles)(Home));
