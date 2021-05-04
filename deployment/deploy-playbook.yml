@@ -46,22 +46,25 @@
             fstype: ext4
             replication-type: none
 
-    - name: Checking full deployment
+    - name: Preparing annotations
+      ansible.builtin.shell: date --utc '+%FT%TZ'
+      register: date
+
+    - name: Preparing deployment
+      ansible.builtin.replace:
+        path: ./full-deployment.yml
+        regexp: 'annot-date'
+        replace: "{{ date.stdout }}"
+
+    - name: Checking deployment
       kubernetes.core.k8s:
         state: present
         namespace: fpl
         apply: yes
-        src: ./full-deployment.yml
+        src: full-deployment.yml
 
-    - name: Un-deploying Pods
-      kubernetes.core.k8s:
-        state: absent
-        namespace: fpl
-        src: ./pods.yml
-
-    - name: Re-deploying Pods
-      kubernetes.core.k8s:
-        state: present
-        apply: yes
-        namespace: fpl
-        src: ./pods.yml
+    - name: Cleanup config
+      ansible.builtin.replace:
+        path: ./full-deployment.yml
+        regexp: '\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z'
+        replace: 'annot-date'
