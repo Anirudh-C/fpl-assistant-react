@@ -194,7 +194,7 @@ class Home extends React.Component {
                       link="/players"
                     />
                   </Grid>
-                  <Grid item xs={0} md={3}></Grid>
+                  <Grid item xs={false} md={3}></Grid>
                   <Grid item xs={12} md={6}>
                     <Card className={classes.card} variant="outlined">
                       <CardContent>
@@ -207,7 +207,7 @@ class Home extends React.Component {
                       </CardContent>
                     </Card>
                   </Grid>
-                  <Grid item xs={0} md={3}></Grid>
+                  <Grid item xs={false} md={3}></Grid>
                 </Grid>
               </Container>
             </div>

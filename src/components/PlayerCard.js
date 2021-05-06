@@ -15,6 +15,9 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Divider from '@material-ui/core/Divider';
+
+import Fixture from "./Fixture";
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -76,6 +79,9 @@ const styles = theme => ({
     stats: {
         border: "none"
     },
+    fixtures: {
+        marginTop: theme.spacing(4),
+    }
 });
 
 class PlayerCard extends React.Component {
@@ -96,6 +102,7 @@ class PlayerCard extends React.Component {
                 "https://resources.premierleague.com/premierleague/photos/players/110x140/p" +
                 this.props.defaultPlayer.code + ".png",
             scoreColour: this.props.scoreColour,
+            fixtures: [],
         };
     }
 
@@ -127,6 +134,9 @@ class PlayerCard extends React.Component {
         fetch("/api/element_types")
             .then(response => response.json())
             .then(response => this.setState({ types: response["element_types"] }));
+        fetch("/api/get_fixtures")
+            .then(response => response.json())
+            .then(response => this.setState({ fixtures: response["fixtures"] }));
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -244,6 +254,31 @@ class PlayerCard extends React.Component {
         return stats;
     }
 
+    renderFixtures() {
+        let fixtures = [];
+
+        this.state.fixtures.forEach(
+            (fixture, i) =>
+                {
+                    if (this.state.player.team_name === fixture.Home ||
+                        this.state.player.team_name === fixture.Away) {
+                        fixtures.push(
+                            <Grid key={i} item xs={12} md={12}>
+                              <Fixture
+                                home={fixture.Home}
+                                away={fixture.Away}
+                                home_id={fixture.home_code}
+                                away_id={fixture.away_code}
+                              />
+                            </Grid>
+                        );
+                    }
+                }
+        );
+
+        return fixtures;
+    }
+
     render() {
         const size = 250;
         const strokeWidth = 20;
@@ -252,6 +287,7 @@ class PlayerCard extends React.Component {
         const circ = 2 * Math.PI * radius;
         const { classes } = this.props;
         const stats = this.renderStats(classes);
+        const fixtures = this.renderFixtures();
 
         return (
             <Card className={classes.card} variant="outlined">
@@ -331,7 +367,18 @@ class PlayerCard extends React.Component {
                           {stats}
                         </Grid>
                 }
-
+                {this.state.chosen && <Divider className={classes.fixtures}/>}
+                <Grid container spacing={2} className={classes.fixtures}>
+                  {
+                      this.state.chosen &&
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h6" component="h2" align="center">
+                          Fixtures
+                        </Typography>
+                      </Grid>
+                  }
+                  {fixtures}
+                </Grid>
               </CardContent>
               {this.props.showStats &&
                <CardActions>
