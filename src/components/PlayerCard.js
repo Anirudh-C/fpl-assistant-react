@@ -130,10 +130,13 @@ class PlayerCard extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery != "") {
+        if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery !== "") {
             fetch("/api/search_players?name=" + this.state.inputQuery.toLowerCase())
                 .then(response => response.json())
                 .then(response => this.setState({ options: response["players"] }));
+        }
+        if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery === "") {
+            this.setState({ options: [] });
         }
         if (prevProps.scoreColour !== this.props.scoreColour) {
             this.setState({
@@ -194,7 +197,7 @@ class PlayerCard extends React.Component {
                 </Typography>
               </Grid>
               <Grid item>
-                {Math.floor(option.score)}
+                {option.short_name}
               </Grid>
             </Grid>
         );
@@ -294,7 +297,7 @@ class PlayerCard extends React.Component {
                          r={radius}
                          strokeWidth={strokeWidth}
                          strokeDasharray={circ}
-                         strokeDashoffset={(100 - this.state.player.score) * circ / 100}
+                         strokeDashoffset={this.state.player.score === -1 ? circ : (100 - this.state.player.score) * circ / 100}
                        />
                        <text
                          className={classes.scoreText}
@@ -303,7 +306,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                         {Math.floor(this.state.player.score)}
+                         {this.state.player.score}
                        </text>
                        <text
                          className={classes.scoreRank}

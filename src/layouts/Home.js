@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
@@ -15,6 +14,7 @@ import AccountCircleTwoToneIcon from '@material-ui/icons/AccountCircleTwoTone';
 import { Link } from "react-router-dom";
 
 import DashCard from "../components/DashCard";
+import Fixture from "../components/Fixture";
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -48,7 +48,14 @@ const styles = theme => ({
     },
     avatar: {
         backgroundColor: "#fc045c"
-    }
+    },
+    card: {
+        transition: "0.3s",
+        boxShadow: "0 8px 40px -12px rgba(0,0,0,0.3)",
+        "&:hover": {
+            boxShadow: "0 16px 70px -12.125px rgba(0,0,0,0.3)"
+        }
+    },
 });
 
 class Home extends React.Component {
@@ -58,6 +65,7 @@ class Home extends React.Component {
             has_cookie: false,
             user_name: "",
             userDialog: false,
+            fixtures: [],
         };
     }
 
@@ -100,10 +108,32 @@ class Home extends React.Component {
                 this.props.loginCallback();
             }
         }
+        fetch("/api/get_fixtures")
+            .then(response => response.json())
+            .then(response => this.setState({ fixtures: response["fixtures"] }));
+    }
+
+    generateFixtures() {
+        let fixtures = [];
+
+        this.state.fixtures.forEach(
+            (fixture, i) =>
+                fixtures.push(
+                    <Grid key={i} item xs={12} md={12}>
+                      <Fixture
+                        home={fixture.Home}
+                        away={fixture.Away}
+                        home_id={fixture.home_code}
+                        away_id={fixture.away_code}
+                      />
+                    </Grid>));
+
+        return fixtures;
     }
 
     render() {
         const { classes } = this.props;
+        const fixtures = this.generateFixtures();
 
         return (
             <div className={classes.root}>
@@ -141,7 +171,7 @@ class Home extends React.Component {
                   <Grid item xs={12}>
                     <DashCard
                       title="Manage your team"
-                      subtitle="Coming Soon"
+                      subtitle="Login and find out which players to pick for next Gameweek"
                       linkText="More"
                       link="/picks"
                       loginReqd={true}
@@ -151,7 +181,7 @@ class Home extends React.Component {
                   <Grid item xs={12} md={6}>
                     <DashCard
                       title="Compare players"
-                      subtitle="Coming Soon"
+                      subtitle="Search and compare statistics of any two players"
                       linkText="More"
                       link="/compare"
                     />
@@ -159,11 +189,25 @@ class Home extends React.Component {
                   <Grid item xs={12} md={6}>
                     <DashCard
                       title="The Best Players"
-                      subtitle="Coming Soon"
+                      subtitle="Navigate the list of all players"
                       linkText="More"
                       link="/players"
                     />
                   </Grid>
+                  <Grid item xs={0} md={3}></Grid>
+                  <Grid item xs={12} md={6}>
+                    <Card className={classes.card} variant="outlined">
+                      <CardContent>
+                        <Typography variant="h5" component="h2">
+                          Fixtures
+                        </Typography>
+                        <Grid container spacing={2}>
+                          {fixtures}
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={0} md={3}></Grid>
                 </Grid>
               </Container>
             </div>
