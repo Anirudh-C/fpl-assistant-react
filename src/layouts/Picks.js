@@ -65,12 +65,11 @@ class Picks extends React.Component {
     }
 
     componentDidMount() {
-        fetch("/api/picks")
+        fetch("/api/pick_players", {
+            credentials: 'include'
+        })
             .then(response => response.json())
-            .then(response => this.setState({
-                subs: response["subs"],
-                transfers: response["transfers"]
-            }));
+            .then(response => console.log(response));
     }
 
     createPlayerCards() {
@@ -84,7 +83,7 @@ class Picks extends React.Component {
                 change.forEach(
                     (player, j) =>
                         cards["subs"].push(
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12} md={6} key={j}>
                               <PlayerCard
                                 key={"" + i + "." + j}
                                 defaultPlayer={player}
@@ -98,7 +97,7 @@ class Picks extends React.Component {
                 change.forEach(
                     (player, j) =>
                         cards["transfers"].push(
-                            <Grid item xs={12} md={6}>
+                            <Grid item xs={12} md={6} key={j}>
                               <PlayerCard
                                 key={"" + i + "." + j}
                                 defaultPlayer={player}

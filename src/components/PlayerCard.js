@@ -286,7 +286,9 @@ class PlayerCard extends React.Component {
         const radius = size / 2 - strokeWidth / 2;
         const circ = 2 * Math.PI * radius;
         const { classes } = this.props;
-        const stats = this.renderStats(classes);
+        if (this.props.showStats) {
+            const stats = this.renderStats(classes);
+        }
         const fixtures = this.renderFixtures();
 
         return (
