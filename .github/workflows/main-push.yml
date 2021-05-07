@@ -43,7 +43,8 @@ jobs:
       run: docker push strangeloop1710/fpl-api:latest
 
   deploy:
-    needs: tag-backend
+    needs: [tag-frontend, tag-backend]
+    if: "always() && (needs.tag-frontend.outputs.job_status == 'success' || needs.tag-backend.outputs.job_status == 'success')"
     runs-on: ubuntu-latest
 
     steps:
