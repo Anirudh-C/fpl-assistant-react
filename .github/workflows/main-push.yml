@@ -8,6 +8,7 @@ on:
 
 jobs:
   tag-frontend:
+    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +23,9 @@ jobs:
       run: docker tag strangeloop1710/fpl-react:pr-latest strangeloop1710/fpl-react:latest
     - name: Push frontend image
       run: docker push strangeloop1710/fpl-react:latest
+
   tag-backend:
+    if: ${{ github.event_name != 'push' }}
     needs: tag-frontend
     runs-on: ubuntu-latest
 
@@ -38,6 +41,7 @@ jobs:
       run: docker tag strangeloop1710/fpl-api:pr-latest strangeloop1710/fpl-api:latest
     - name: Push backend image
       run: docker push strangeloop1710/fpl-api:latest
+
   deploy:
     needs: tag-backend
     runs-on: ubuntu-latest
