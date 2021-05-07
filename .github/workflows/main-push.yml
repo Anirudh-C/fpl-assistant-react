@@ -44,7 +44,7 @@ jobs:
 
   deploy:
     needs: [tag-frontend, tag-backend]
-    if: "always() && (needs.tag-frontend.outputs.job_status == 'success' || needs.tag-backend.outputs.job_status == 'success')"
+    if: ${{ always() }}
     runs-on: ubuntu-latest
 
     steps:
