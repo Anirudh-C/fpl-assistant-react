@@ -57,9 +57,7 @@ class Picks extends React.Component {
             creativity: "0.0",
         };
         this.state = {
-            subs: [[this.defaultPlayer, this.defaultPlayer]],
             transfers: [[this.defaultPlayer, this.defaultPlayer]],
-            subComplete: false,
             transferComplete: false
         };
     }
@@ -69,35 +67,20 @@ class Picks extends React.Component {
             credentials: 'include'
         })
             .then(response => response.json())
-            .then(response => console.log(response));
+            .then(response => this.setState({ transfers: response["transfers"]}));
     }
 
     createPlayerCards() {
         let cards = {
-            subs: [],
             transfers: [],
         };
 
-        this.state.subs.forEach(
-            (change, i) =>
-                change.forEach(
-                    (player, j) =>
-                        cards["subs"].push(
-                            <Grid item xs={12} md={6} key={j}>
-                              <PlayerCard
-                                key={"" + i + "." + j}
-                                defaultPlayer={player}
-                                scoreColour={j === 0 ? "#fc045c" : "#00ff87"}
-                                showStats={false}
-                              />
-                            </Grid>
-                        )));
         this.state.transfers.forEach(
             (change, i) =>
                 change.forEach(
                     (player, j) =>
                         cards["transfers"].push(
-                            <Grid item xs={12} md={6} key={j}>
+                            <Grid item xs={12} md={6} key={i + "" + j}>
                               <PlayerCard
                                 key={"" + i + "." + j}
                                 defaultPlayer={player}
@@ -124,43 +107,6 @@ class Picks extends React.Component {
                 </Toolbar>
               </AppBar>
               <Container maxWidth="lg" className={classes.container}>
-                <Grid container>
-                  <Grid item xs={11} md={11}>
-                    <Typography variant="h4">
-                      Substitutions
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={1} md={1}>
-                    {this.state.subComplete ?
-                     <Tooltip title="Undo all">
-                       <IconButton
-                         className={classes.cancelButton}
-                         onClick={() => this.setState({ subComplete: false })}
-                       >
-                         <CancelTwoToneIcon />
-                       </IconButton>
-                     </Tooltip>
-                     :
-                     <Tooltip title="Make all">
-                       <IconButton
-                         className={classes.doneButton}
-                         onClick={() => this.setState({ subComplete: true })}
-                       >
-                         <CheckCircleTwoToneIcon />
-                       </IconButton>
-                     </Tooltip>}
-                  </Grid>
-                </Grid>
-                <Grid container spacing={3}>
-                  {this.state.subComplete ?
-                   <Grid item xs={12} md={12}>
-                     <Typography variant="h5" align="center" color="textSecondary">
-                       Done!
-                     </Typography>
-                   </Grid>
-                   :
-                   cards["subs"]}
-                </Grid>
                 <Grid container>
                   <Grid item xs={11} md={11}>
                     <Typography variant="h4">

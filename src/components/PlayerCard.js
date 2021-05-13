@@ -94,7 +94,7 @@ class PlayerCard extends React.Component {
             types: [],
             stats: this.props.stats,
             inputQuery: "",
-            chosen: false,
+            chosen: this.props.defaultPlayer.id !== 0,
             playerUrl:
             this.props.defaultPlayer.id === 0 ?
                 ""
@@ -285,9 +285,11 @@ class PlayerCard extends React.Component {
         const center = size / 2;
         const radius = size / 2 - strokeWidth / 2;
         const circ = 2 * Math.PI * radius;
+        const stroke = (30 - Math.round(100 * this.state.player.score)/100) * circ / 30;
+        let stats = [];
         const { classes } = this.props;
-        if (this.props.showStats) {
-            const stats = this.renderStats(classes);
+        if (this.props.showStatsp) {
+            stats = this.renderStats(classes);
         }
         const fixtures = this.renderFixtures();
 
@@ -335,7 +337,7 @@ class PlayerCard extends React.Component {
                          r={radius}
                          strokeWidth={strokeWidth}
                          strokeDasharray={circ}
-                         strokeDashoffset={this.state.player.score === -1 ? circ : (100 - this.state.player.score) * circ / 100}
+                         strokeDashoffset={stroke}
                        />
                        <text
                          className={classes.scoreText}
@@ -344,7 +346,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                         {this.state.player.score}
+                         {Math.round(10 * this.state.player.score)/10}
                        </text>
                        <text
                          className={classes.scoreRank}
@@ -353,7 +355,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                         # {Math.floor(Math.random() * 100)}
+                         # {this.state.player.week_rank}
                        </text>
                      </svg>
                    </Grid>
