@@ -8,7 +8,6 @@ on:
 
 jobs:
   tag-frontend:
-    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +24,6 @@ jobs:
       run: docker push strangeloop1710/fpl-react:latest
 
   tag-backend:
-    if: ${{ github.event_name != 'push' }}
     needs: tag-frontend
     runs-on: ubuntu-latest
 
@@ -44,7 +42,6 @@ jobs:
 
   deploy:
     needs: [tag-frontend, tag-backend]
-    if: ${{ always() }}
     runs-on: ubuntu-latest
 
     steps:
