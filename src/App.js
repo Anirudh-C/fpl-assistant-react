@@ -41,13 +41,17 @@ class App extends React.Component {
         };
     }
 
-    handleLogin(response) {
+    handleLoginAPI(response) {
         if (response.ok) {
             this.setState({ loggedIn : true });
         }
         else {
             this.setState({ errorDialog: true, errorText: response.statusText });
         }
+    }
+
+    handleLogin() {
+        this.setState({ loggedIn : true });
     }
 
     handleLogout() {
@@ -58,6 +62,14 @@ class App extends React.Component {
         this.setState({ errorDialog: false, errorText: "" });
     }
 
+    componentDidMount() {
+        const has_key = typeof Cookies.get("key") !== "undefined";
+        const has_id = typeof Cookies.get("user_id") !== "undefined";
+        if (has_key && has_id) {
+            this.setState({ loggedIn: true });
+        }
+    }
+
     render() {
         return (
             <ThemeProvider theme={appTheme}>
@@ -65,13 +77,17 @@ class App extends React.Component {
                 <div>
                   <Switch>
                     <Route path="/login">
-                      <Login loginCallback={this.handleLogin.bind(this)}/>
+                      <Login loginCallback={this.handleLoginAPI.bind(this)}/>
                     </Route>
                     <Route path="/picks" component={Picks} />
                     <Route path="/compare" component={Compare}/>
                     <Route path="/players" component={PlayerTable}/>
                     <Route path="/">
-                      <Home login={this.state.loggedIn} logoutCallback={this.handleLogout.bind(this)}/>
+                      <Home
+                        login={this.state.loggedIn}
+                        logoutCallback={this.handleLogout.bind(this)}
+                        loginCallback={this.handleLogin.bind(this)}
+                      />
                       <ErrorDialog
                         visible={this.state.errorDialog}
                         text={this.state.errorText}

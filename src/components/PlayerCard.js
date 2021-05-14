@@ -15,6 +15,9 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Divider from '@material-ui/core/Divider';
+
+import Fixture from "./Fixture";
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -76,6 +79,9 @@ const styles = theme => ({
     stats: {
         border: "none"
     },
+    fixtures: {
+        marginTop: theme.spacing(4),
+    }
 });
 
 class PlayerCard extends React.Component {
@@ -88,7 +94,7 @@ class PlayerCard extends React.Component {
             types: [],
             stats: this.props.stats,
             inputQuery: "",
-            chosen: false,
+            chosen: this.props.defaultPlayer.id !== 0,
             playerUrl:
             this.props.defaultPlayer.id === 0 ?
                 ""
@@ -96,6 +102,7 @@ class PlayerCard extends React.Component {
                 "https://resources.premierleague.com/premierleague/photos/players/110x140/p" +
                 this.props.defaultPlayer.code + ".png",
             scoreColour: this.props.scoreColour,
+            fixtures: [],
         };
     }
 
@@ -127,13 +134,19 @@ class PlayerCard extends React.Component {
         fetch("/api/element_types")
             .then(response => response.json())
             .then(response => this.setState({ types: response["element_types"] }));
+        fetch("/api/get_fixtures")
+            .then(response => response.json())
+            .then(response => this.setState({ fixtures: response["fixtures"] }));
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery != "") {
+        if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery !== "") {
             fetch("/api/search_players?name=" + this.state.inputQuery.toLowerCase())
                 .then(response => response.json())
                 .then(response => this.setState({ options: response["players"] }));
+        }
+        if (prevState.inputQuery !== this.state.inputQuery && this.state.inputQuery === "") {
+            this.setState({ options: [] });
         }
         if (prevProps.scoreColour !== this.props.scoreColour) {
             this.setState({
@@ -194,7 +207,7 @@ class PlayerCard extends React.Component {
                 </Typography>
               </Grid>
               <Grid item>
-                {Math.floor(option.score)}
+                {option.short_name}
               </Grid>
             </Grid>
         );
@@ -241,14 +254,44 @@ class PlayerCard extends React.Component {
         return stats;
     }
 
+    renderFixtures() {
+        let fixtures = [];
+
+        this.state.fixtures.forEach(
+            (fixture, i) =>
+                {
+                    if (this.state.player.team_name === fixture.Home ||
+                        this.state.player.team_name === fixture.Away) {
+                        fixtures.push(
+                            <Grid key={i} item xs={12} md={12}>
+                              <Fixture
+                                home={fixture.Home}
+                                away={fixture.Away}
+                                home_id={fixture.home_code}
+                                away_id={fixture.away_code}
+                              />
+                            </Grid>
+                        );
+                    }
+                }
+        );
+
+        return fixtures;
+    }
+
     render() {
         const size = 250;
         const strokeWidth = 20;
         const center = size / 2;
         const radius = size / 2 - strokeWidth / 2;
         const circ = 2 * Math.PI * radius;
+        const stroke = (30 - Math.round(100 * this.state.player.score)/100) * circ / 30;
+        let stats = [];
         const { classes } = this.props;
-        const stats = this.renderStats(classes);
+        if (this.props.showStats) {
+            stats = this.renderStats(classes);
+        }
+        const fixtures = this.renderFixtures();
 
         return (
             <Card className={classes.card} variant="outlined">
@@ -294,7 +337,7 @@ class PlayerCard extends React.Component {
                          r={radius}
                          strokeWidth={strokeWidth}
                          strokeDasharray={circ}
-                         strokeDashoffset={(100 - this.state.player.score) * circ / 100}
+                         strokeDashoffset={stroke}
                        />
                        <text
                          className={classes.scoreText}
@@ -303,7 +346,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                         {Math.floor(this.state.player.score)}
+                         {Math.round(10 * this.state.player.score)/10}
                        </text>
                        <text
                          className={classes.scoreRank}
@@ -312,7 +355,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                         # {Math.floor(Math.random() * 100)}
+                         Rank: {this.state.player.week_rank}
                        </text>
                      </svg>
                    </Grid>
@@ -328,7 +371,18 @@ class PlayerCard extends React.Component {
                           {stats}
                         </Grid>
                 }
-
+                {this.state.chosen && <Divider className={classes.fixtures}/>}
+                <Grid container spacing={2} className={classes.fixtures}>
+                  {
+                      this.state.chosen &&
+                      <Grid item xs={12} md={12}>
+                        <Typography variant="h6" component="h2" align="center">
+                          Fixtures
+                        </Typography>
+                      </Grid>
+                  }
+                  {fixtures}
+                </Grid>
               </CardContent>
               {this.props.showStats &&
                <CardActions>

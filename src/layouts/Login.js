@@ -10,6 +10,8 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { withStyles } from "@material-ui/core/styles";
 
@@ -44,7 +46,11 @@ const styles = theme => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
-    }
+    },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
 });
 
 class Login extends React.Component {
@@ -53,7 +59,8 @@ class Login extends React.Component {
         this.state = {
             email: "",
             password: "",
-            loggedIn: false
+            loggedIn: false,
+            loading: false
         };
 
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -67,21 +74,27 @@ class Login extends React.Component {
             form.append("password", this.state.password);
             const request = {
                 method: "POST",
-                credentials: "include",
                 body: form
             };
-            fetch("/api/login", request)
-                .then(response => {
-                    if (response.ok) {
-                        this.setState({ loggedIn: true });
-                        this.props.history.push("/");
-                        this.props.loginCallback(response);
-                    }
-                    else {
-                        this.props.history.push("/");
-                        this.props.loginCallback(response);
-                    }
-                });
+            this.setState({ loading: true },
+                          () => {
+                              fetch("/api/login", request)
+                                  .then(response => {
+                                      if (response.ok) {
+                                          this.setState({ loggedIn: true, loading: false });
+                                          this.props.history.push({
+                                              pathname: "/",
+                                              state: "set_cookie"
+                                          });
+                                          this.props.loginCallback(response);
+                                      }
+                                      else {
+                                          this.setState({ loading: false });
+                                          this.props.history.push("/");
+                                          this.props.loginCallback(response);
+                                      }
+                                  });
+                          });
         }
         else {
             this.props.history.push("/");
@@ -92,79 +105,84 @@ class Login extends React.Component {
         const { classes } = this.props;
 
         return (
-            <Grid container component="main" className={classes.root}>
-              <CssBaseline />
-              <Grid item xs={false} sm={4} md={7} className={classes.image} />
-              <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                <div className={classes.paper}>
-                  <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon/>
-                  </Avatar>
-                  <Typography component="h1" variant="h5">
-                    Sign In to FPL
-                  </Typography>
-                  <form
-                    className={classes.form}
-                    noValidate
-                    onSubmit={this.handleSubmit}>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      autoComplete="email"
-                      autoFocus
-                      onInput={
-                          event =>
-                              this.setState({email: event.target.value})}
-                    />
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="password"
-                      label="Password"
-                      type="password"
-                      autoComplete="current-password"
-                      onInput={
-                          event =>
-                              this.setState({password: event.target.value})}
-                    />
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      color="primary"
-                      className={classes.submit}
-                    >
-                      Sign In
-                    </Button>
-                    <Grid container>
-                      <Grid item xs>
-                        <Link
-                          href="https://users.premierleague.com/accounts/password-reset"
-                          variant="body2"
-                        >
-                          Forgot Password?
-                        </Link>
+            <div>
+              <Grid container component="main" className={classes.root}>
+                <CssBaseline />
+                <Grid item xs={false} sm={4} md={7} className={classes.image} />
+                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                  <div className={classes.paper}>
+                    <Avatar className={classes.avatar}>
+                      <LockOutlinedIcon/>
+                    </Avatar>
+                    <Typography component="h1" variant="h5">
+                      Sign In to FPL
+                    </Typography>
+                    <form
+                      className={classes.form}
+                      noValidate
+                      onSubmit={this.handleSubmit}>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                        onInput={
+                            event =>
+                                this.setState({email: event.target.value})}
+                      />
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="password"
+                        label="Password"
+                        type="password"
+                        autoComplete="current-password"
+                        onInput={
+                            event =>
+                                this.setState({password: event.target.value})}
+                      />
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                      >
+                        Sign In
+                      </Button>
+                      <Grid container>
+                        <Grid item xs>
+                          <Link
+                            href="https://users.premierleague.com/accounts/password-reset"
+                            variant="body2"
+                          >
+                            Forgot Password?
+                          </Link>
+                        </Grid>
+                        <Grid item>
+                          <Link
+                            href="https://users.premierleague.com/a/profile/register"
+                            variant="body2"
+                          >
+                            {"Don't have an account? Sign Up"}
+                          </Link>
+                        </Grid>
                       </Grid>
-                      <Grid item>
-                        <Link
-                          href="https://users.premierleague.com/a/profile/register"
-                          variant="body2"
-                        >
-                          {"Don't have an account? Sign Up"}
-                        </Link>
-                      </Grid>
-                    </Grid>
-                  </form>
+                    </form>
                   </div>
+                </Grid>
               </Grid>
-            </Grid>
+              <Backdrop className={classes.backdrop} open={this.state.loading}>
+                <CircularProgress color="inherit"/>
+              </Backdrop>
+            </div>
         );
     }
 }
