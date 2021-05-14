@@ -288,7 +288,7 @@ class PlayerCard extends React.Component {
         const stroke = (30 - Math.round(100 * this.state.player.score)/100) * circ / 30;
         let stats = [];
         const { classes } = this.props;
-        if (this.props.showStatsp) {
+        if (this.props.showStats) {
             stats = this.renderStats(classes);
         }
         const fixtures = this.renderFixtures();
@@ -355,7 +355,7 @@ class PlayerCard extends React.Component {
                          dominantBaseline="middle"
                          textAnchor="middle"
                        >
-                         # {this.state.player.week_rank}
+                         Rank: {this.state.player.week_rank}
                        </text>
                      </svg>
                    </Grid>

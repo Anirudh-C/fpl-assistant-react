@@ -62,6 +62,14 @@ class App extends React.Component {
         this.setState({ errorDialog: false, errorText: "" });
     }
 
+    componentDidMount() {
+        const has_key = typeof Cookies.get("key") !== "undefined";
+        const has_id = typeof Cookies.get("user_id") !== "undefined";
+        if (has_key && has_id) {
+            this.setState({ loggedIn: true });
+        }
+    }
+
     render() {
         return (
             <ThemeProvider theme={appTheme}>

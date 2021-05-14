@@ -108,6 +108,16 @@ class Home extends React.Component {
                 this.props.loginCallback();
             }
         }
+        else {
+            const has_key = typeof Cookies.get("key") !== "undefined";
+            const has_id = typeof Cookies.get("user_id") !== "undefined";
+            if (has_key && has_id) {
+                this.setState({ has_cookie: true });
+                fetch("/api/username?id=" + Cookies.get("user_id"))
+                    .then(response => response.json())
+                    .then(response => this.setState({ username: response["name"] }));
+            }
+        }
         fetch("/api/get_fixtures")
             .then(response => response.json())
             .then(response => this.setState({ fixtures: response["fixtures"] }));

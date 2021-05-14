@@ -8,6 +8,8 @@ import Grid from '@material-ui/core/Grid';
 import CheckCircleTwoToneIcon from '@material-ui/icons/CheckCircleTwoTone';
 import CancelTwoToneIcon from '@material-ui/icons/CancelTwoTone';
 import Tooltip from '@material-ui/core/Tooltip';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -41,6 +43,11 @@ const styles = theme => ({
         marginLeft: "auto",
         color: '#fc045c',
     },
+    backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: '#fff',
+    },
+
 });
 
 class Picks extends React.Component {
@@ -57,17 +64,44 @@ class Picks extends React.Component {
             creativity: "0.0",
         };
         this.state = {
-            transfers: [[this.defaultPlayer, this.defaultPlayer]],
-            transferComplete: false
+            transfers: [[ ]],
+            transferComplete: false,
+            loading: false,
         };
     }
 
     componentDidMount() {
-        fetch("/api/pick_players", {
-            credentials: 'include'
-        })
-            .then(response => response.json())
-            .then(response => this.setState({ transfers: response["transfers"]}));
+        this.setState({ loading: true },
+                      () => {
+                          fetch("/api/pick_players", {
+                              credentials: 'include'
+                          })
+                              .then(response => {
+                                  if (response.ok) {
+                                      return response.json();
+                                  }
+                                  else {
+                                      this.setState({
+                                          transferComplete: true,
+                                      });
+
+                                      return response.json();
+                                  }
+                              })
+                              .then(response => {
+                                  if (response["transfers"].length) {
+                                      this.setState({
+                                          transfers: response["transfers"],
+                                          loading: false});
+                                  }
+                                  else {
+                                      this.setState({
+                                          transferComplete: true,
+                                          loading: false
+                                      });
+                                  }
+                              });
+                      });
     }
 
     createPlayerCards() {
@@ -93,6 +127,43 @@ class Picks extends React.Component {
         return cards;
     }
 
+    handleTransfers() {
+        if (this.state.transfers[0].length) {
+            this.setState({ loading: true},
+                          () =>
+                          {
+                              const request = {
+                                  method: "POST",
+                                  credentials: "include",
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                      "inplayers": this.state.transfers.map(x => x[0].id),
+                                      "outplayers": this.state.transfers.map(x => x[1].id)
+                                  })
+                              };
+                              fetch("/api/transfers", request)
+                                  .then(response => {
+                                  if (response.ok) {
+                                      this.setState({
+                                          loading: false,
+                                          transferComplete: true
+                                      });
+                                  }
+                                      else {
+                                          this.setState({
+                                              loading: false,
+                                          });
+                                      }
+                                  });
+                          });
+        }
+        else {
+            this.setState({
+                transferComplete: true
+            });
+        }
+    }
+
     render() {
         const { classes } = this.props;
         let cards = this.createPlayerCards();
@@ -109,25 +180,13 @@ class Picks extends React.Component {
               <Container maxWidth="lg" className={classes.container}>
                 <Grid container>
                   <Grid item xs={11} md={11}>
-                    <Typography variant="h4">
-                      Transfers
-                    </Typography>
                   </Grid>
                   <Grid item xs={1} md={1}>
-                    {this.state.transferComplete ?
-                     <Tooltip title="Undo all">
-                       <IconButton
-                         className={classes.cancelButton}
-                         onClick={() => this.setState({ transferComplete: false })}
-                       >
-                         <CancelTwoToneIcon />
-                       </IconButton>
-                     </Tooltip>
-                     :
+                    {!this.state.transferComplete &&
                      <Tooltip title="Make all">
                        <IconButton
                          className={classes.doneButton}
-                         onClick={() => this.setState({ transferComplete: true })}
+                         onClick={this.handleTransfers.bind(this)}
                        >
                          <CheckCircleTwoToneIcon />
                        </IconButton>
@@ -138,13 +197,16 @@ class Picks extends React.Component {
                   {this.state.transferComplete ?
                    <Grid item xs={12} md={12}>
                      <Typography variant="h5" align="center" color="textSecondary">
-                       Done!
+                       You have the best team!!
                      </Typography>
                    </Grid>
                    :
                    cards["transfers"]}
                 </Grid>
               </Container>
+              <Backdrop className={classes.backdrop} open={this.state.loading}>
+                <CircularProgress color="inherit"/>
+              </Backdrop>
             </div>
         );
     }
