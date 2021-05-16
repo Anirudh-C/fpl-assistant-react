@@ -185,7 +185,7 @@ class PlayerTable extends React.Component {
                                    <TableCell align="right">{player.goals_scored}</TableCell>
                                    <TableCell align="right">{player.assists}</TableCell>
                                    <TableCell align="right">{player.clean_sheets}</TableCell>
-                                   <TableCell align="right">{player.now_cost}</TableCell>
+                                   <TableCell align="right">{player.now_cost/10}</TableCell>
                                    <TableCell align="right">{player.points_per_game}</TableCell>
                                  </TableRow>
                              );
