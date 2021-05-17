@@ -241,7 +241,17 @@ class PlayerCard extends React.Component {
                             </TableCell>
                             <TableCell align="right" className={classes.stats}>
                               <Typography variant="h6">
-                                {this.state.player[item.key] + item.text[1]}
+                                {
+                                    this.state.player[item.key] === null ?
+                                        0 + item.text[1]
+                                        :
+                                        (
+                                            item.key === "now_cost" ?
+                                                this.state.player[item.key] / 10 + item.text[1]
+                                                :
+                                                this.state.player[item.key] + item.text[1]
+                                        )
+                                }
                               </Typography>
                             </TableCell>
                           </TableRow>
